@@ -1,14 +1,18 @@
-<x-filament-breezy::grid-section md=2 :title="__('filament-breezy::default.profile.personal_info.heading')" :description="__('filament-breezy::default.profile.personal_info.subheading')">
-    <x-filament::card>
-        <form wire:submit.prevent="submit" class="space-y-6">
+<x-filament::section>
+    <x-slot name="heading">
+        Informations personnelles
+    </x-slot>
+    <x-slot name="description">
+        Gérer vos informations personnelles et professionnelles.
+    </x-slot>
 
-            {{ $this->form }}
+    <form wire:submit="submit" class="space-y-6">
+        {{ $this->form }}
 
-            <div class="text-right">
-                <x-filament::button type="submit" form="submit" class="align-right">
-                    {{ __('filament-breezy::default.profile.personal_info.submit.label') }}
-                </x-filament::button>
-            </div>
-        </form>
-    </x-filament::card>
-</x-filament-breezy::grid-section>
+        <div class="flex justify-end">
+            <x-filament::button type="submit" color="primary">
+                Mettre à jour
+            </x-filament::button>
+        </div>
+    </form>
+</x-filament::section>

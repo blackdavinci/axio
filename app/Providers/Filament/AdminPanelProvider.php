@@ -66,7 +66,6 @@ class AdminPanelProvider extends PanelProvider
                     ->myProfileComponents([
                         'personal_info' => \App\Filament\Breezy\MyProfileComponents\PersonalInfoComponent::class,
                         'update_password' => \App\Filament\Breezy\MyProfileComponents\UpdatePasswordComponent::class,
-                        'two_factor' => \Jeffgreco13\FilamentBreezy\Livewire\TwoFactorAuthentication::class,
                     ])
                     ->enableTwoFactorAuthentication(
                         force: fn () => app(\App\Settings\SecuritySettings::class)->enable_2fa

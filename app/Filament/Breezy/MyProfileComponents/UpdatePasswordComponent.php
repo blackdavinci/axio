@@ -27,9 +27,18 @@ class UpdatePasswordComponent extends MyProfileComponent
         $this->form->fill();
     }
 
-    protected function getFormSchema(): array
+    public function form(Form $form): Form
     {
         $securitySettings = app(SecuritySettings::class);
+        
+        return $form
+            ->schema([
+                $this->getPasswordFormSection($securitySettings)
+            ]);
+    }
+    
+    protected function getPasswordFormSection(SecuritySettings $securitySettings): Section
+    {
         
         // Construire les règles de validation basées sur les settings
         $passwordRules = Password::min($securitySettings->password_min_length);
@@ -46,10 +55,9 @@ class UpdatePasswordComponent extends MyProfileComponent
             $passwordRules->symbols();
         }
 
-        return [
-            Section::make('Changer le mot de passe')
-                ->description('Assurez-vous d\'utiliser un mot de passe long et aléatoire pour rester en sécurité.')
-                ->schema([
+        return Section::make('Changer le mot de passe')
+            ->description('Assurez-vous d\'utiliser un mot de passe long et aléatoire pour rester en sécurité.')
+            ->schema([
                     TextInput::make('current_password')
                         ->label('Mot de passe actuel')
                         ->password()
@@ -73,8 +81,7 @@ class UpdatePasswordComponent extends MyProfileComponent
                                 ->required()
                                 ->dehydrated(false),
                         ]),
-                ]),
-        ];
+                ]);
     }
 
     private function getPasswordRequirements(SecuritySettings $settings): string

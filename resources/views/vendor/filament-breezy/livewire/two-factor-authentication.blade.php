@@ -1,6 +1,4 @@
-<x-filament-breezy::grid-section md=2 :title="__('filament-breezy::default.profile.2fa.title')" :description="__('filament-breezy::default.profile.2fa.description')">
-
-    <x-filament::card>
+<div class="space-y-6">
 
         @if($this->showRequiresTwoFactorAlert())
 
@@ -86,6 +84,6 @@
             @endif
 
         @endunless
-    </x-filament::card>
+    
     <x-filament-actions::modals />
-</x-filament-breezy::grid-section>
+</div>

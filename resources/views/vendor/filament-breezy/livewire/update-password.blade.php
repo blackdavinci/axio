@@ -1,14 +1,18 @@
-<x-filament-breezy::grid-section md=2 :title="__('filament-breezy::default.profile.password.heading')" :description="__('filament-breezy::default.profile.password.subheading')">
-    <x-filament::card>
-        <form wire:submit.prevent="submit" class="space-y-6">
+<x-filament::section>
+    <x-slot name="heading">
+        Changer le mot de passe
+    </x-slot>
+    <x-slot name="description">
+        Assurez-vous d'utiliser un mot de passe long et aléatoire pour rester en sécurité.
+    </x-slot>
 
-            {{ $this->form }}
+    <form wire:submit="submit" class="space-y-6">
+        {{ $this->form }}
 
-            <div class="text-right">
-                <x-filament::button type="submit" form="submit" class="align-right">
-                    {{ __('filament-breezy::default.profile.password.submit.label') }}
-                </x-filament::button>
-            </div>
-        </form>
-    </x-filament::card>
-</x-filament-breezy::grid-section>
+        <div class="flex justify-end">
+            <x-filament::button type="submit" color="primary">
+                Mettre à jour le mot de passe
+            </x-filament::button>
+        </div>
+    </form>
+</x-filament::section>

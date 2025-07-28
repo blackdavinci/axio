@@ -2,6 +2,7 @@
 
 namespace App\Filament\Breezy\MyProfileComponents;
 
+use Filament\Facades\Filament;
 use Filament\Forms\Components\Component;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
@@ -10,6 +11,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Form;
 use Jeffgreco13\FilamentBreezy\Livewire\MyProfileComponent;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
 
@@ -20,18 +22,79 @@ class PersonalInfoComponent extends MyProfileComponent
     public array $only = ['prenom', 'nom', 'email', 'genre', 'photo', 'telephone', 'telephone_secondaire', 'matricule', 'grade', 'adresse', 'date_naissance', 'categorie', 'specialite', 'personne_urgence', 'telephone_urgence', 'poste'];
 
     public array $data = [];
-    
+
     public $user;
 
     public function mount()
     {
-        $this->user = \Filament\Facades\Filament::getCurrentPanel()->auth()->user();
-        $this->form->fill($this->user->only($this->only));
+        $this->user = Filament::getCurrentPanel()->auth()->user();
+        $userData = $this->user->only($this->only);
+        $this->form->fill($userData);
+
     }
 
-    protected function getFormSchema(): array
+    public function form(Form $form): Form
     {
-        return [
+        return $form
+            ->schema([
+            Section::make()
+                ->schema([
+                        Grid::make([
+                            'default' => 1,
+                            'sm' => 3,
+                        ])->schema([
+                            Grid::make(1)
+                                ->schema([
+                                    FileUpload::make('photo')
+                                        ->label('Photo de profil')
+                                        ->image()
+                                        ->imageEditor()
+                                        ->avatar()
+                                        ->disk('public')
+                                        ->directory('users/photos')
+                                        ->visibility('public')
+                                        ->columnSpanFull(),
+
+                                    TextInput::make('roles.name')
+                                        ->label('Rôle')
+                                        ->placeholder('Aucun rôle assigné'),
+
+                                    TextInput::make('actif')
+                                        ->label('Statut d\'emploi')
+
+                                ])
+                                ->columnSpan(1),
+                            Grid::make(2)
+                                ->schema([
+                                    TextInput::make('fullName')
+                                        ->label('Nom complet'),
+
+                                    TextInput::make('matricule')
+                                        ->label('Matricule')
+                                        ->placeholder('Non renseigné'),
+
+                                    TextInput::make('service.nom')
+                                        ->label('Service')
+                                        ->placeholder('Aucun service assigné'),
+
+                                    TextInput::make('poste')
+                                        ->label('Poste/Fonction')
+                                        ->placeholder('Non renseigné'),
+
+                                    TextInput::make('telephone')
+                                        ->label('Téléphone principal')
+                                        ->placeholder('Non renseigné'),
+
+                                    TextInput::make('email')
+                                        ->label('Email'),
+
+
+                                ])
+                                ->columnSpan(2)
+                        ]),
+
+
+                    ]),
             Section::make('Informations personnelles')
                 ->schema([
                     FileUpload::make('photo')
@@ -149,7 +212,7 @@ class PersonalInfoComponent extends MyProfileComponent
                                 ->validateFor(lenient: true),
                         ]),
                 ]),
-        ];
+            ]);
     }
 
     public function submit(): void
