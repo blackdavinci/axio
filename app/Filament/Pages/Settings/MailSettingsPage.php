@@ -10,9 +10,9 @@ use Filament\Pages\SettingsPage;
 class MailSettingsPage extends SettingsPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
-    protected static ?string $navigationLabel = 'Configuration email';
-    protected static ?string $title = 'Configuration email et notifications';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationLabel = 'Email';
+    protected static ?string $title = 'Configuration Email';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 2;
 
     protected static string $settings = MailSettings::class;

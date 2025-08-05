@@ -12,15 +12,15 @@ use Filament\Notifications\Notification;
 class GeneralSettingsPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-cog-6-tooth';
-    protected static ?string $navigationLabel = 'Configuration générale';
+    protected static ?string $navigationLabel = 'Générale';
     protected static ?string $title = 'Configuration générale';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 1;
 
     protected static string $view = 'filament.pages.settings.general-settings';
-    
+
     public $data = [];
-    
+
     public function mount()
     {
         $settings = app(GeneralSettings::class);
@@ -45,7 +45,7 @@ class GeneralSettingsPage extends Page
             'archivable_document_types' => $settings->archivable_document_types,
         ];
     }
-    
+
     protected function getHeaderActions(): array
     {
         return [
@@ -55,11 +55,11 @@ class GeneralSettingsPage extends Page
                 ->action('save'),
         ];
     }
-    
+
     public function save()
     {
         $settings = app(GeneralSettings::class);
-        
+
         $settings->organization_name = $this->data['organization_name'];
         $settings->organization_short_name = $this->data['organization_short_name'];
         $settings->organization_logo = $this->data['organization_logo'];
@@ -78,9 +78,9 @@ class GeneralSettingsPage extends Page
         $settings->archive_storage_path = $this->data['archive_storage_path'];
         $settings->compress_archived_documents = $this->data['compress_archived_documents'];
         $settings->archivable_document_types = $this->data['archivable_document_types'];
-        
+
         $settings->save();
-        
+
         Notification::make()
             ->title('Configuration sauvegardée')
             ->success()

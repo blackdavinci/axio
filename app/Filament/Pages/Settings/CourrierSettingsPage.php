@@ -3,19 +3,22 @@
 namespace App\Filament\Pages\Settings;
 
 use App\Settings\CourrierSettings;
+use App\Models\Priorite;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Pages\SettingsPage;
+use Filament\Actions\Action;
 
 class CourrierSettingsPage extends SettingsPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
-    protected static ?string $navigationLabel = 'Configuration courrier';
+    protected static ?string $navigationLabel = 'Courrier';
     protected static ?string $title = 'Configuration du courrier';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 3;
 
     protected static string $settings = CourrierSettings::class;
+
 
     public function form(Form $form): Form
     {
@@ -123,4 +126,5 @@ class CourrierSettingsPage extends SettingsPage
                     ]),
             ]);
     }
+
 }

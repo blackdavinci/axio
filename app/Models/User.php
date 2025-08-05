@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,10 +19,24 @@ use Spatie\Activitylog\LogOptions;
 use Jeffgreco13\FilamentBreezy\Traits\TwoFactorAuthenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements Auditable
+class User extends Authenticatable implements Auditable, FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, HasRoles, AuditableTrait, LogsActivity, TwoFactorAuthenticatable, HasApiTokens;
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Example condition: Allow access only to users with specific email domain and verified email
+
+        // Check if the user has one of the allowed roles
+        $allowedRoles = ['super_admin'];
+
+        if ($this->hasAnyRole($allowedRoles) && $this->is_active) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -36,6 +52,7 @@ class User extends Authenticatable implements Auditable
         'email',
         'password',
         'service_id',
+        'structure_id',
         'telephone',
         'telephone_secondaire',
         'matricule',
@@ -47,7 +64,7 @@ class User extends Authenticatable implements Auditable
         'personne_urgence',
         'telephone_urgence',
         'poste',
-        'actif',
+        'statut',
     ];
 
     /**
@@ -60,6 +77,20 @@ class User extends Authenticatable implements Auditable
         'remember_token',
     ];
 
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Example condition: Allow access only to users with specific email domain and verified email
+
+        // Check if the user has one of the allowed roles
+        $allowedRoles = ['super_admin', 'directeur', 'agent','secretaire','partenaire','chef','public'];
+
+        if ($this->hasAnyRole($allowedRoles) && $this->statut) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -70,7 +101,7 @@ class User extends Authenticatable implements Auditable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'actif' => 'boolean',
+            'statut' => 'boolean',
             'date_naissance' => 'date',
         ];
     }
@@ -82,7 +113,7 @@ class User extends Authenticatable implements Auditable
     {
         $prenom = Str::substr($this->prenom ?? '', 0, 1);
         $nom = Str::substr($this->nom ?? '', 0, 1);
-        
+
         return $prenom . $nom;
     }
 
@@ -116,6 +147,26 @@ class User extends Authenticatable implements Auditable
         return $this->belongsTo(Service::class);
     }
 
+    public function structure(): BelongsTo
+    {
+        return $this->belongsTo(Structure::class);
+    }
+
+    public function courriersAssignes(): HasMany
+    {
+        return $this->hasMany(Courrier::class, 'user_id');
+    }
+
+    public function courriersCreated(): HasMany
+    {
+        return $this->hasMany(Courrier::class, 'created_by');
+    }
+
+    public function structuresChef(): HasMany
+    {
+        return $this->hasMany(Structure::class, 'chef_id');
+    }
+
 
     // Scopes
     public function scopeActifs($query)
@@ -123,9 +174,20 @@ class User extends Authenticatable implements Auditable
         return $query->where('actif', true);
     }
 
+    // Accesseur pour is_active (utilise le champ 'actif' existant)
+    public function getIsActiveAttribute(): bool
+    {
+        return $this->actif ?? true;
+    }
+
     public function scopeDuService($query, int $serviceId)
     {
         return $query->where('service_id', $serviceId);
+    }
+
+    public function scopeDeLaStructure($query, int $structureId)
+    {
+        return $query->where('structure_id', $structureId);
     }
 
     // Méthodes métier

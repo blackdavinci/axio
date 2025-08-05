@@ -11,16 +11,20 @@ use Filament\Notifications\Notification;
 
 class BreezySettingsPage extends Page
 {
+    public static function canAccess(): bool
+    {
+        return true;
+    }
     protected static ?string $navigationIcon = 'heroicon-o-user-circle';
-    protected static ?string $navigationLabel = 'Configuration profil';
+    protected static ?string $navigationLabel = 'Profil';
     protected static ?string $title = 'Configuration des profils utilisateur';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 5;
 
     protected static string $view = 'filament.pages.settings.breezy-settings';
-    
+
     public $data = [];
-    
+
     public function mount()
     {
         $settings = app(BreezySettings::class);
@@ -32,7 +36,7 @@ class BreezySettingsPage extends Page
             'sanctum_abilities' => $settings->sanctum_abilities,
         ];
     }
-    
+
     protected function getHeaderActions(): array
     {
         return [
@@ -42,19 +46,19 @@ class BreezySettingsPage extends Page
                 ->action('save'),
         ];
     }
-    
+
     public function save()
     {
         $settings = app(BreezySettings::class);
-        
+
         $settings->enable_registration = $this->data['enable_registration'];
         $settings->enable_password_reset = $this->data['enable_password_reset'];
         $settings->enable_profile_page = $this->data['enable_profile_page'];
         $settings->force_email_verification = $this->data['force_email_verification'];
         $settings->sanctum_abilities = $this->data['sanctum_abilities'];
-        
+
         $settings->save();
-        
+
         Notification::make()
             ->title('Configuration sauvegardée')
             ->success()

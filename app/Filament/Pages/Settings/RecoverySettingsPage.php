@@ -12,15 +12,15 @@ use Filament\Notifications\Notification;
 class RecoverySettingsPage extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-currency-dollar';
-    protected static ?string $navigationLabel = 'Configuration recouvrement';
+    protected static ?string $navigationLabel = 'Recouvrement';
     protected static ?string $title = 'Configuration du recouvrement';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 6;
 
     protected static string $view = 'filament.pages.settings.recovery-settings';
-    
+
     public $data = [];
-    
+
     public function mount()
     {
         $settings = app(RecoverySettings::class);
@@ -39,7 +39,7 @@ class RecoverySettingsPage extends Page
             'litigation_contact_email' => $settings->litigation_contact_email,
         ];
     }
-    
+
     protected function getHeaderActions(): array
     {
         return [
@@ -49,11 +49,11 @@ class RecoverySettingsPage extends Page
                 ->action('save'),
         ];
     }
-    
+
     public function save()
     {
         $settings = app(RecoverySettings::class);
-        
+
         $settings->recovery_reminder1_days = $this->data['recovery_reminder1_days'];
         $settings->recovery_reminder2_days = $this->data['recovery_reminder2_days'];
         $settings->recovery_mise_en_demeure_days = $this->data['recovery_mise_en_demeure_days'];
@@ -66,9 +66,9 @@ class RecoverySettingsPage extends Page
         $settings->late_payment_interest_rate = $this->data['late_payment_interest_rate'];
         $settings->auto_escalate_to_litigation = $this->data['auto_escalate_to_litigation'];
         $settings->litigation_contact_email = $this->data['litigation_contact_email'];
-        
+
         $settings->save();
-        
+
         Notification::make()
             ->title('Configuration du recouvrement sauvegardée')
             ->success()

@@ -19,6 +19,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('settings.profile');
     Route::get('settings/password', Password::class)->name('settings.password');
     Route::get('settings/appearance', Appearance::class)->name('settings.appearance');
+    
+    // Routes pour les médias
+    Route::get('media/{media}/show', [\App\Http\Controllers\MediaController::class, 'show'])
+        ->name('media.show')
+        ->where('media', '[0-9]+');
+    Route::get('media/{media}/download', [\App\Http\Controllers\MediaController::class, 'download'])
+        ->name('media.download')
+        ->where('media', '[0-9]+');
 });
 
 require __DIR__.'/auth.php';

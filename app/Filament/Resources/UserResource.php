@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use App\Models\Service;
+use App\Models\Structure;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -142,20 +143,20 @@ class UserResource extends Resource
 
                 Forms\Components\Section::make('Affectation')
                     ->schema([
+                        Forms\Components\Select::make('structure_id')
+                            ->label('Structure')
+                            ->relationship('structure', 'nom')
+                            ->searchable()
+                            ->preload()
+                            ->getOptionLabelFromRecordUsing(fn ($record) => $record->nom . ' (' . $record->type_label . ')')
+                            ->helperText('Choisissez le département ou service d\'affectation'),
+
                         Forms\Components\Select::make('service_id')
-                            ->label('Service')
+                            ->label('Service (ancien - transition)')
                             ->relationship('service', 'nom')
                             ->searchable()
                             ->preload()
-                            ->createOptionForm([
-                                Forms\Components\TextInput::make('nom')
-                                    ->required()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('code')
-                                    ->required()
-                                    ->maxLength(10),
-                                Forms\Components\Textarea::make('description'),
-                            ]),
+                            ->visible(false),
 
                         Forms\Components\Select::make('role')
                             ->label('Rôle')
@@ -198,11 +199,23 @@ class UserResource extends Resource
                     ->sortable()
                     ->copyable(),
 
-                Tables\Columns\TextColumn::make('service.nom')
-                    ->label('Service')
+                Tables\Columns\TextColumn::make('structure.nom')
+                    ->label('Structure')
                     ->searchable()
                     ->sortable()
-                    ->badge(),
+                    ->formatStateUsing(fn ($record) => $record->structure ? $record->structure->nom . ' (' . $record->structure->type_label . ')' : 'Non assigné')
+                    ->badge()
+                    ->color(fn ($record) => match($record->structure?->type) {
+                        'departement' => 'primary',
+                        'service' => 'success',
+                        default => 'gray'
+                    }),
+
+                Tables\Columns\TextColumn::make('service.nom')
+                    ->label('Service (ancien)')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\TextColumn::make('poste')
                     ->label('Poste')
@@ -235,10 +248,16 @@ class UserResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Tables\Filters\SelectFilter::make('structure')
+                    ->relationship('structure', 'nom')
+                    ->searchable()
+                    ->preload(),
+
                 Tables\Filters\SelectFilter::make('service')
                     ->relationship('service', 'nom')
                     ->searchable()
-                    ->preload(),
+                    ->preload()
+                    ->visible(false),
 
                 Tables\Filters\SelectFilter::make('roles')
                     ->relationship('roles', 'name')

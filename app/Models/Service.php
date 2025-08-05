@@ -19,6 +19,8 @@ class Service extends Model implements Auditable
         'code',
         'description',
         'parent_id',
+        'departement_id',
+        'type_rattachement',
         'actif',
         'ordre',
     ];
@@ -39,9 +41,20 @@ class Service extends Model implements Auditable
         return $this->hasMany(Service::class, 'parent_id')->orderBy('ordre');
     }
 
+    public function departement(): BelongsTo
+    {
+        return $this->belongsTo(Departement::class);
+    }
+
     public function utilisateurs(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+
+    // Alias pour compatibilité
+    public function users(): HasMany
+    {
+        return $this->utilisateurs();
     }
 
     // Scopes
@@ -55,6 +68,26 @@ class Service extends Model implements Auditable
         return $query->whereNull('parent_id');
     }
 
+    public function scopeRattachesDirection($query)
+    {
+        return $query->where('type_rattachement', 'direction');
+    }
+
+    public function scopeRattachesDepartement($query)
+    {
+        return $query->where('type_rattachement', 'departement');
+    }
+
+    public function scopeAvecDepartement($query)
+    {
+        return $query->whereNotNull('departement_id');
+    }
+
+    public function scopeSansDepartement($query)
+    {
+        return $query->whereNull('departement_id');
+    }
+
     // Accessors
     public function getCheminCompletAttribute(): string
     {
@@ -62,9 +95,18 @@ class Service extends Model implements Auditable
         $service = $this;
         $visited = collect(); // Protection contre les boucles infinies
         
+        // Ajouter Direction générale en racine
+        $chemin->prepend('Direction générale');
+        
+        // Ajouter le département si le service y est rattaché
+        if ($this->departement) {
+            $chemin->push($this->departement->nom);
+        }
+        
+        // Construire la hiérarchie des services
         while ($service && !$visited->contains($service->id)) {
             $visited->push($service->id);
-            $chemin->prepend($service->nom);
+            $chemin->push($service->nom);
             $service = $service->parent;
             
             // Protection supplémentaire contre les boucles profondes
@@ -74,6 +116,15 @@ class Service extends Model implements Auditable
         }
         
         return $chemin->implode(' > ');
+    }
+
+    public function getTypeRattachementLabelAttribute(): string
+    {
+        return match ($this->type_rattachement) {
+            'direction' => 'Direction générale',
+            'departement' => 'Département',
+            default => 'Non défini',
+        };
     }
 
     // Activity Log Configuration

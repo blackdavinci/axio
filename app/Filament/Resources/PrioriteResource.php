@@ -18,9 +18,9 @@ class PrioriteResource extends Resource
     protected static ?string $model = Priorite::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-flag';
-    protected static ?string $navigationLabel = 'Priorités';
+    protected static ?string $navigationLabel = 'Priorités courriers';
     protected static ?string $modelLabel = 'Priorité';
-    protected static ?string $pluralModelLabel = 'Priorités';
+    protected static ?string $pluralModelLabel = 'Priorités courriers';
     protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 3;
 

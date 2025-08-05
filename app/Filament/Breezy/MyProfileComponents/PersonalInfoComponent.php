@@ -3,7 +3,6 @@
 namespace App\Filament\Breezy\MyProfileComponents;
 
 use Filament\Facades\Filament;
-use Filament\Forms\Components\Component;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -22,7 +21,7 @@ class PersonalInfoComponent extends MyProfileComponent
     public array $only = ['prenom', 'nom', 'email', 'genre', 'photo', 'telephone', 'telephone_secondaire', 'matricule', 'grade', 'adresse', 'date_naissance', 'categorie', 'specialite', 'personne_urgence', 'telephone_urgence', 'poste'];
 
     public array $data = [];
-
+    
     public $user;
 
     public function mount()
@@ -30,188 +29,129 @@ class PersonalInfoComponent extends MyProfileComponent
         $this->user = Filament::getCurrentPanel()->auth()->user();
         $userData = $this->user->only($this->only);
         $this->form->fill($userData);
-
     }
 
     public function form(Form $form): Form
     {
         return $form
             ->schema([
-            Section::make()
-                ->schema([
-                        Grid::make([
-                            'default' => 1,
-                            'sm' => 3,
-                        ])->schema([
-                            Grid::make(1)
-                                ->schema([
-                                    FileUpload::make('photo')
-                                        ->label('Photo de profil')
-                                        ->image()
-                                        ->imageEditor()
-                                        ->avatar()
-                                        ->disk('public')
-                                        ->directory('users/photos')
-                                        ->visibility('public')
-                                        ->columnSpanFull(),
+                Section::make('Informations personnelles')
+                    ->schema([
+                        FileUpload::make('photo')
+                            ->label('Photo de profil')
+                            ->image()
+                            ->imageEditor()
+                            ->avatar()
+                            ->disk('public')
+                            ->directory('users/photos')
+                            ->visibility('public')
+                            ->columnSpanFull(),
 
-                                    TextInput::make('roles.name')
-                                        ->label('Rôle')
-                                        ->placeholder('Aucun rôle assigné'),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('prenom')
+                                    ->label('Prénom')
+                                    ->required()
+                                    ->maxLength(255),
 
-                                    TextInput::make('actif')
-                                        ->label('Statut d\'emploi')
+                                TextInput::make('nom')
+                                    ->label('Nom')
+                                    ->required()
+                                    ->maxLength(255),
+                            ]),
 
-                                ])
-                                ->columnSpan(1),
-                            Grid::make(2)
-                                ->schema([
-                                    TextInput::make('fullName')
-                                        ->label('Nom complet'),
+                        Grid::make(3)
+                            ->schema([
+                                Select::make('genre')
+                                    ->label('Genre')
+                                    ->options([
+                                        'M' => 'Masculin',
+                                        'F' => 'Féminin',
+                                    ])
+                                    ->required(),
 
-                                    TextInput::make('matricule')
-                                        ->label('Matricule')
-                                        ->placeholder('Non renseigné'),
+                                TextInput::make('email')
+                                    ->label('Email')
+                                    ->email()
+                                    ->required()
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(255),
 
-                                    TextInput::make('service.nom')
-                                        ->label('Service')
-                                        ->placeholder('Aucun service assigné'),
+                                TextInput::make('matricule')
+                                    ->label('Matricule')
+                                    ->unique(ignoreRecord: true)
+                                    ->maxLength(255),
+                            ]),
 
-                                    TextInput::make('poste')
-                                        ->label('Poste/Fonction')
-                                        ->placeholder('Non renseigné'),
+                        Grid::make(2)
+                            ->schema([
+                                PhoneInput::make('telephone')
+                                    ->label('Téléphone principal')
+                                    ->defaultCountry('GN')
+                                    ->validateFor(lenient: true)
+                                    ->required(),
 
-                                    TextInput::make('telephone')
-                                        ->label('Téléphone principal')
-                                        ->placeholder('Non renseigné'),
+                                PhoneInput::make('telephone_secondaire')
+                                    ->label('Téléphone secondaire')
+                                    ->defaultCountry('GN')
+                                    ->validateFor(lenient: true),
+                            ]),
 
-                                    TextInput::make('email')
-                                        ->label('Email'),
-
-
-                                ])
-                                ->columnSpan(2)
-                        ]),
-
-
+                        Textarea::make('adresse')
+                            ->label('Adresse')
+                            ->rows(3)
+                            ->maxLength(500)
+                            ->columnSpanFull(),
                     ]),
-            Section::make('Informations personnelles')
-                ->schema([
-                    FileUpload::make('photo')
-                        ->label('Photo de profil')
-                        ->image()
-                        ->imageEditor()
-                        ->avatar()
-                        ->disk('public')
-                        ->directory('users/photos')
-                        ->visibility('public')
-                        ->columnSpanFull(),
 
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('prenom')
-                                ->label('Prénom')
-                                ->required()
-                                ->maxLength(255),
+                Section::make('Informations professionnelles')
+                    ->schema([
+                        Grid::make(3)
+                            ->schema([
+                                TextInput::make('grade')
+                                    ->label('Grade')
+                                    ->maxLength(255),
 
-                            TextInput::make('nom')
-                                ->label('Nom')
-                                ->required()
-                                ->maxLength(255),
-                        ]),
+                                TextInput::make('poste')
+                                    ->label('Poste/Fonction')
+                                    ->maxLength(255),
 
-                    Grid::make(3)
-                        ->schema([
-                            Select::make('genre')
-                                ->label('Genre')
-                                ->options([
-                                    'M' => 'Masculin',
-                                    'F' => 'Féminin',
-                                ])
-                                ->required(),
+                                Select::make('categorie')
+                                    ->label('Catégorie')
+                                    ->options([
+                                        'fonctionnaire' => 'Fonctionnaire',
+                                        'contractuel' => 'Contractuel',
+                                        'consultant' => 'Consultant',
+                                        'stagiaire' => 'Stagiaire',
+                                    ]),
+                            ]),
 
-                            TextInput::make('email')
-                                ->label('Email')
-                                ->email()
-                                ->required()
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('specialite')
+                                    ->label('Spécialité')
+                                    ->maxLength(255),
 
-                            TextInput::make('matricule')
-                                ->label('Matricule')
-                                ->unique(ignoreRecord: true)
-                                ->maxLength(255),
-                        ]),
+                                DatePicker::make('date_naissance')
+                                    ->label('Date de naissance')
+                                    ->maxDate(now()->subYears(16)),
+                            ]),
+                    ]),
 
-                    Grid::make(2)
-                        ->schema([
-                            PhoneInput::make('telephone')
-                                ->label('Téléphone principal')
-                                ->defaultCountry('GN')
-                                ->validateFor(lenient: true)
-                                ->required(),
+                Section::make('Contact d\'urgence')
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('personne_urgence')
+                                    ->label('Personne à contacter')
+                                    ->maxLength(255),
 
-                            PhoneInput::make('telephone_secondaire')
-                                ->label('Téléphone secondaire')
-                                ->defaultCountry('GN')
-                                ->validateFor(lenient: true),
-                        ]),
-
-                    Textarea::make('adresse')
-                        ->label('Adresse')
-                        ->rows(3)
-                        ->maxLength(500)
-                        ->columnSpanFull(),
-                ]),
-
-            Section::make('Informations professionnelles')
-                ->schema([
-                    Grid::make(3)
-                        ->schema([
-                            TextInput::make('grade')
-                                ->label('Grade')
-                                ->maxLength(255),
-
-                            TextInput::make('poste')
-                                ->label('Poste/Fonction')
-                                ->maxLength(255),
-
-                            Select::make('categorie')
-                                ->label('Catégorie')
-                                ->options([
-                                    'fonctionnaire' => 'Fonctionnaire',
-                                    'contractuel' => 'Contractuel',
-                                    'consultant' => 'Consultant',
-                                    'stagiaire' => 'Stagiaire',
-                                ]),
-                        ]),
-
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('specialite')
-                                ->label('Spécialité')
-                                ->maxLength(255),
-
-                            DatePicker::make('date_naissance')
-                                ->label('Date de naissance')
-                                ->maxDate(now()->subYears(16)),
-                        ]),
-                ]),
-
-            Section::make('Contact d\'urgence')
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
-                            TextInput::make('personne_urgence')
-                                ->label('Personne à contacter')
-                                ->maxLength(255),
-
-                            PhoneInput::make('telephone_urgence')
-                                ->label('Téléphone urgence')
-                                ->defaultCountry('GN')
-                                ->validateFor(lenient: true),
-                        ]),
-                ]),
+                                PhoneInput::make('telephone_urgence')
+                                    ->label('Téléphone urgence')
+                                    ->defaultCountry('GN')
+                                    ->validateFor(lenient: true),
+                            ]),
+                    ]),
             ]);
     }
 

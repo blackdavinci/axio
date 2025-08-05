@@ -2,9 +2,12 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Widgets\NotificationsWidget;
 use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Jeffgreco13\FilamentBreezy\BreezyCore;
+use Coolsam\NestedComments\NestedCommentsPlugin;
+use Filament\View\PanelsRenderHook;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -42,6 +45,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\UserStatsWidget::class,
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                NotificationsWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -56,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),
+                NestedCommentsPlugin::make(),
                 BreezyCore::make()
                     ->myProfile(
                         shouldRegisterUserMenu: true,
@@ -64,8 +69,8 @@ class AdminPanelProvider extends PanelProvider
                         slug: 'mon-profil'
                     )
                     ->myProfileComponents([
-                        'personal_info' => \App\Filament\Breezy\MyProfileComponents\PersonalInfoComponent::class,
-                        'update_password' => \App\Filament\Breezy\MyProfileComponents\UpdatePasswordComponent::class,
+                        'personal_info_component' => \App\Filament\Breezy\MyProfileComponents\PersonalInfoComponent::class,
+                        'update_password_component' => \App\Filament\Breezy\MyProfileComponents\UpdatePasswordComponent::class,
                     ])
                     ->enableTwoFactorAuthentication(
                         force: fn () => app(\App\Settings\SecuritySettings::class)->enable_2fa
@@ -81,6 +86,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                PanelsRenderHook::USER_MENU_BEFORE,
+                fn () => view('components.notification-bell')
+            );
     }
 }

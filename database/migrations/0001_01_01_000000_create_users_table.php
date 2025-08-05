@@ -13,10 +13,28 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            // Champs priorité haute
+            $table->string('prenom');
+            $table->string('nom');
             $table->string('name');
+            $table->enum('genre', ['M', 'F']);
+            $table->string('photo')->nullable();
+            $table->string('telephone_secondaire')->nullable();
+            $table->string('matricule')->unique()->nullable();
+            $table->string('grade')->nullable();
+            $table->text('adresse')->nullable();
+
+            // Champs priorité moyenne sélectionnés
+            $table->date('date_naissance')->nullable();
+            $table->enum('categorie', ['fonctionnaire', 'contractuel', 'consultant', 'stagiaire'])->nullable();
+            $table->string('specialite')->nullable();
+            $table->string('personne_urgence')->nullable();
+            $table->string('telephone_urgence')->nullable();
+            $table->string('avatar_url')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->boolean('statut')->default(false);
             $table->rememberToken();
             $table->timestamps();
         });

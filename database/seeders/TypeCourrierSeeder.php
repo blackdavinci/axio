@@ -13,8 +13,6 @@ class TypeCourrierSeeder extends Seeder
      */
     public function run(): void
     {
-        // Supprimer les anciens types s'ils existent
-        TypeCourrier::truncate();
 
         $typesCourriers = [
             [

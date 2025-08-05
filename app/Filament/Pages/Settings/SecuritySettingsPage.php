@@ -10,9 +10,9 @@ use Filament\Pages\SettingsPage;
 class SecuritySettingsPage extends SettingsPage
 {
     protected static ?string $navigationIcon = 'heroicon-o-shield-check';
-    protected static ?string $navigationLabel = 'Configuration sécurité';
+    protected static ?string $navigationLabel = 'Sécurité';
     protected static ?string $title = 'Configuration de la sécurité';
-    protected static ?string $navigationGroup = 'Paramètres';
+    protected static ?string $navigationGroup = 'Configuration';
     protected static ?int $navigationSort = 4;
 
     protected static string $settings = SecuritySettings::class;
